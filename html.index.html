@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stay Inn — Formulário de Comodidades</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Montserrat+Alternates:wght@700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --dark: #282828;
+    --darker: #1A1A1A;
+    --charcoal: #383838;
+    --offwhite: #F5F0E8;
+    --sand: #EDE0C8;
+    --text: #2A2219;
+    --muted: #7A6E60;
+    --error: #C0392B;
+    --radius: 10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--offwhite);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--darker);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 3px solid var(--gold);
+  }
+  .logo-text { display: flex; flex-direction: column; }
+  .logo-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--gold); letter-spacing: 1px;
+  }
+  .logo-sub {
+    font-size: 9px; font-weight: 600;
+    color: #9A9285; letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .form-title {
+    margin-left: auto;
+    font-size: 12px; font-weight: 600;
+    color: #C8C0B0; letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    background: var(--charcoal);
+    padding: 14px 32px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .step-label { font-size: 12px; font-weight: 700; color: var(--gold); min-width: 90px; }
+  .progress-track {
+    flex: 1; height: 5px;
+    background: #555; border-radius: 10px; overflow: hidden;
+  }
+  #progress-fill {
+    height: 100%; background: var(--gold);
+    border-radius: 10px; transition: width 0.4s ease;
+  }
+  .step-pct { font-size: 12px; font-weight: 700; color: #9A9285; min-width: 36px; text-align: right; }
+
+  /* MAIN */
+  main {
+    max-width: 700px; margin: 0 auto;
+    padding: 40px 24px 100px;
+  }
+
+  /* STEP */
+  .step { display: none; }
+  .step.active { display: block; animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  .step-header {
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--sand);
+  }
+  .step-header h2 {
+    font-size: 22px; font-weight: 800;
+    color: var(--dark);
+  }
+  .step-header h2 span { color: var(--gold); }
+  .step-header p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* FIELD */
+  .field { margin-bottom: 20px; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 7px;
+  }
+  .field label .req { color: var(--gold); margin-left: 2px; }
+
+  input[type=text], input[type=email], input[type=tel],
+  input[type=date], input[type=number], input[type=time],
+  select, textarea {
+    width: 100%;
+    background: #fff;
+    border: 2px solid var(--sand);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+  }
+  textarea { resize: vertical; min-height: 90px; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23C9A84C' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; }
+
+  .field.has-error input,
+  .field.has-error select,
+  .field.has-error textarea { border-color: var(--error); }
+  .field .err-msg { font-size: 11px; color: var(--error); margin-top: 5px; display: none; }
+  .field.has-error .err-msg { display: block; }
+
+  /* ROW */
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 500px) { .row { grid-template-columns: 1fr; } }
+
+  /* RADIO BUTTONS */
+  .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
+  .radio-btn {
+    padding: 9px 18px;
+    border: 2px solid var(--sand);
+    border-radius: 50px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+    color: var(--muted);
+    user-select: none;
+  }
+  .radio-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .radio-btn.selected {
+    background: var(--gold); border-color: var(--gold);
+    color: var(--darker);
+  }
+
+  /* CHECKBOX GRID */
+  .check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .check-item {
+    display: flex; align-items: center; gap: 10px;
+    background: #fff; border: 2px solid var(--sand);
+    border-radius: var(--radius); padding: 10px 14px;
+    cursor: pointer; transition: all 0.2s;
+    font-size: 13px; font-weight: 500; color: var(--text);
+  }
+  .check-item:hover { border-color: var(--gold); }
+  .check-item input[type=checkbox] { display: none; }
+  .check-item .box {
+    width: 18px; height: 18px;
+    border: 2px solid var(--sand);
+    border-radius: 4px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .check-item.checked { border-color: var(--gold); background: #FBF5E6; }
+  .check-item.checked .box {
+    background: var(--gold); border-color: var(--gold);
+  }
+  .check-item.checked .box::after {
+    content: '✓'; font-size: 11px; font-weight: 800; color: var(--darker);
+  }
+
+  /* SECTION DIVIDER */
+  .section-title {
+    font-size: 11px; font-weight: 800; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--gold);
+    margin: 28px 0 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--sand);
+  }
+
+  /* CONDITIONAL */
+  .conditional { display: none; }
+  .conditional.show { display: block; }
+
+  /* INFO BOX */
+  .info-box {
+    background: #FBF5E6;
+    border: 1px solid var(--sand);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  /* NAV */
+  #nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--darker);
+    border-top: 3px solid var(--gold);
+    padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 100;
+  }
+  .btn {
+    padding: 13px 30px;
+    border-radius: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; border: none;
+    transition: all 0.2s; letter-spacing: 0.5px;
+  }
+  #btn-prev {
+    background: transparent;
+    border: 2px solid #555;
+    color: #9A9285;
+  }
+  #btn-prev:hover { border-color: var(--gold); color: var(--gold); }
+  #btn-next {
+    background: var(--gold); color: var(--darker);
+  }
+  #btn-next:hover { background: var(--gold-light); }
+  #btn-next:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* SUCCESS */
+  #success {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .success-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--gold); margin: 0 auto 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+  }
+  #success h2 { font-size: 26px; font-weight: 800; color: var(--dark); margin-bottom: 10px; }
+  #success p { font-size: 14px; color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 12px;
+    font-size: 11px; color: var(--muted);
+    border-top: 1px solid var(--sand);
+    margin-bottom: 80px;
+  }
+  footer a { color: var(--gold); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-text">
+    <span class="logo-name">STAY INN</span>
+    <span class="logo-sub">Soluções para Hospedagem</span>
+  </div>
+  <div class="form-title">Formulário de Comodidades<br>para Criação de Anúncios</div>
+</header>
+
+<div class="progress-bar-wrap">
+  <span class="step-label" id="step-label">Etapa 1 de 8</span>
+  <div class="progress-track"><div id="progress-fill" style="width:13%"></div></div>
+  <span class="step-pct" id="step-pct">13%</span>
+</div>
+
+<main>
+
+  <!-- STEP 1: CHECK-IN / CHECK-OUT -->
+  <div class="step active" id="step-1">
+    <div class="step-header">
+      <h2>Check-in e <span>Check-out</span></h2>
+      <p>Informe os horários e a forma de recepção dos hóspedes.</p>
+    </div>
+
+    <div class="section-title">Check-in</div>
+    <div class="row">
+      <div class="field" id="f-checkin-inicio">
+        <label>Horário de início</label>
+        <input type="time" id="checkin-inicio"/>
+      </div>
+      <div class="field" id="f-checkin-fim">
+        <label>Horário de término</label>
+        <input type="time" id="checkin-fim"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Como é realizado o check-in?</label>
+      <div class="radio-group">
+        <div class="radio-btn" data-group="tipo-checkin" data-value="presencial" onclick="selectRadio(this)">Presencial</div>
+        <div class="radio-btn" data-group="tipo-checkin" data-value="auto" onclick="selectRadio(this)">Autoatendimento</div>
+        <div class="radio-btn" data-group="tipo-checkin" data-value="whatsapp" onclick="selectRadio(this)">Via WhatsApp</div>
+        <div class="radio-btn" data-group="tipo-checkin" data-value="outro" onclick="selectRadio(this)">Outro</div>
+      </div>
+    </div>
+    <div class="field conditional" id="cond-checkin-outro">
+      <label>Descreva como é feito</label>
+      <input type="text" id="checkin-outro-desc" placeholder="Ex: código enviado por e-mail..."/>
+    </div>
+
+    <div class="section-title">Check-out</div>
+    <div class="row">
+      <div class="field">
+        <label>Horário de início</label>
+        <input type="time" id="checkout-inicio"/>
+      </div>
+      <div class="field">
+        <label>Horário de término</label>
+        <input type="time" id="checkout-fim"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Como é realizado o check-out?</label>
+      <div class="radio-group">
+        <div class="radio-btn" data-group="tipo-checkout" data-value="presencial" onclick="selectRadio(this)">Presencial</div>
+        <div class="radio-btn" data-group="tipo-checkout" data-value="auto" onclick="selectRadio(this)">Autoatendimento</div>
+        <div class="radio-btn" data-group="tipo-checkout" data-value="whatsapp" onclick="selectRadio(this)">Via WhatsApp</div>
+        <div class="radio-btn" data-group="tipo-checkout" data-value="outro" onclick="selectRadio(this)">Outro</div>
+      </div>
+    </div>
+
+    <div class="section-title">Recepção</div>
+    <div class="field">
+      <label>Horário de funcionamento da recepção (se houver)</label>
+      <input type="text" id="recepcao-horario" placeholder="Ex: 08h às 22h / Não possui recepção"/>
+    </div>
+  </div>
+
+  <!-- STEP 2: COMUNICAÇÃO -->
+  <div class="step" id="step-2">
+    <div class="step-header">
+      <h2><span>Comunicação</span> durante a estadia</h2>
+      <p>Como o hóspede entra em contato com a propriedade.</p>
+    </div>
+
+    <div class="section-title">Canal principal de contato</div>
+    <div class="field">
+      <label>Canal preferencial</label>
+      <div class="radio-group">
+        <div class="radio-btn" data-group="canal" data-value="whatsapp" onclick="selectRadio(this)">WhatsApp</div>
+        <div class="radio-btn" data-group="canal" data-value="telefone" onclick="selectRadio(this)">Telefone</div>
+        <div class="radio-btn" data-group="canal" data-value="email" onclick="selectRadio(this)">E-mail</div>
+        <div class="radio-btn" data-group="canal" data-value="outro" onclick="selectRadio(this)">Outro</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>WhatsApp</label>
+        <input type="tel" id="com-whatsapp" placeholder="+55 (48) 99999-0000"/>
+      </div>
+      <div class="field">
+        <label>Telefone</label>
+        <input type="tel" id="com-telefone" placeholder="+55 (48) 3333-0000"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>E-mail para contato durante a estadia</label>
+      <input type="email" id="com-email" placeholder="contato@suapropriedade.com.br"/>
+    </div>
+    <div class="field">
+      <label>Outro canal (se houver)</label>
+      <input type="text" id="com-outro" placeholder="Ex: app, portaria, intercomunicador..."/>
+    </div>
+  </div>
+
+  <!-- STEP 3: INTERNET -->
+  <div class="step" id="step-3">
+    <div class="step-header">
+      <h2><span>Internet</span> e Conectividade</h2>
+      <p>Informações sobre Wi-Fi disponível na propriedade.</p>
+    </div>
+
+    <div class="field">
+      <label>Wi-Fi disponível?</label>
+      <div class="radio-group">
+        <div class="radio-btn" data-group="wifi" data-value="sim" onclick="selectRadio(this); toggleWifi('sim')">Sim</div>
+        <div class="radio-btn" data-group="wifi" data-value="nao" onclick="selectRadio(this); toggleWifi('nao')">Não</div>
+      </div>
+    </div>
+
+    <div class="conditional" id="cond-wifi">
+      <div class="field">
+        <label>Nome da rede (SSID)</label>
+        <input type="text" id="wifi-nome" placeholder="Ex: StayInn_Villa"/>
+      </div>
+      <div class="field">
+        <label>Senha do Wi-Fi</label>
+        <input type="text" id="wifi-senha" placeholder="Senha da rede"/>
+      </div>
+      <div class="field">
+        <label>Cobertura</label>
+        <div class="radio-group">
+          <div class="radio-btn" data-group="wifi-cobertura" data-value="total" onclick="selectRadio(this)">Toda a propriedade</div>
+          <div class="radio-btn" data-group="wifi-cobertura" data-value="parcial" onclick="selectRadio(this)">Parcial</div>
+          <div class="radio-btn" data-group="wifi-cobertura" data-value="areas" onclick="selectRadio(this)">Só nas áreas comuns</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Velocidade aproximada (Mbps)</label>
+        <input type="number" id="wifi-velocidade" placeholder="Ex: 100"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: DESCRIÇÃO DA PROPRIEDADE E ACOMODAÇÕES -->
+  <div class="step" id="step-4">
+    <div class="step-header">
+      <h2>Descrição e <span>Acomodações</span></h2>
+      <p>Dados gerais da propriedade e seus quartos/unidades.</p>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Capacidade total de hóspedes</label>
+        <input type="number" id="cap-total" placeholder="Ex: 20"/>
+      </div>
+      <div class="field">
+        <label>Nº de unidades / quartos</label>
+        <input type="number" id="num-unidades" placeholder="Ex: 6"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Descrição geral da propriedade</label>
+      <textarea id="desc-geral" placeholder="Descreva o estilo, ambiente, diferenciais..."></textarea>
+    </div>
+    <div class="field">
+      <label>Áreas comuns disponíveis</label>
+      <textarea id="areas-comuns" placeholder="Ex: piscina, salão de jogos, churrasqueira, jardim..."></textarea>
+    </div>
+
+    <div class="section-title">Acomodações</div>
+    <div class="info-box">Adicione uma linha para cada quarto/cabana/unidade, com: Capacidade · Tipo de cama · Tamanho (m²) · Banheiro · Cozinha · Ar-cond · TV</div>
+
+    <div id="quartos-container"></div>
+    <button type="button" class="btn" onclick="addQuarto()" style="background:transparent;border:2px dashed var(--gold);color:var(--gold);padding:11px 24px;border-radius:var(--radius);font-size:13px;cursor:pointer;width:100%;margin-top:4px;">+ Adicionar unidade</button>
+  </div>
+
+  <!-- STEP 5: COMODIDADES PRINCIPAIS -->
+  <div class="step" id="step-5">
+    <div class="step-header">
+      <h2>Comodidades <span>Principais</span></h2>
+      <p>Selecione todas as comodidades disponíveis na propriedade.</p>
+    </div>
+
+    <div class="section-title">Climatização e Entretenimento</div>
+    <div class="check-grid">
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="wifi"><div class="box"></div>Wi-Fi</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="ar-cond"><div class="box"></div>Ar-condicionado</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="aquecimento"><div class="box"></div>Aquecimento</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="tv"><div class="box"></div>TV</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="netflix"><div class="box"></div>Streaming (Netflix etc.)</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="som"><div class="box"></div>Sistema de som</label>
+    </div>
+    <div class="field" id="f-tv-pol" style="margin-top:14px">
+      <label>Polegadas da TV (se houver)</label>
+      <input type="text" id="tv-pol" placeholder="Ex: 43'' / 55'' / Varia por quarto"/>
+    </div>
+
+    <div class="section-title">Cozinha e Alimentação</div>
+    <div class="check-grid">
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="cozinha"><div class="box"></div>Cozinha equipada</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="loucas"><div class="box"></div>Louças e talheres</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="microondas"><div class="box"></div>Micro-ondas</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="geladeira"><div class="box"></div>Geladeira</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="cafe"><div class="box"></div>Cafeteira</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="churrasqueira"><div class="box"></div>Churrasqueira</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="utensilios-churrasco"><div class="box"></div>Utensílios de churrasco</label>
+    </div>
+
+    <div class="field" style="margin-top:14px">
+      <label>Café da manhã</label>
+      <div class="radio-group">
+        <div class="radio-btn" data-group="cafe-manha" data-value="incluso" onclick="selectRadio(this)">Incluso</div>
+        <div class="radio-btn" data-group="cafe-manha" data-value="pago" onclick="selectRadio(this)">Pago</div>
+        <div class="radio-btn" data-group="cafe-manha" data-value="nao" onclick="selectRadio(this)">Não oferece</div>
+      </div>
+    </div>
+    <div class="field conditional" id="cond-cafe-valor">
+      <label>Valor do café da manhã (por pessoa)</label>
+      <input type="text" id="cafe-valor" placeholder="Ex: R$ 25,00"/>
+    </div>
+
+    <div class="section-title">Estrutura e Lazer</div>
+    <div class="check-grid">
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="piscina"><div class="box"></div>Piscina</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="varanda"><div class="box"></div>Área externa / Varanda</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="lavanderia"><div class="box"></div>Lavanderia</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="secador"><div class="box"></div>Secador de cabelo</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="roupa-cama"><div class="box"></div>Roupa de cama e banho</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="comod" value="limpeza"><div class="box"></div>Limpeza durante estadia</label>
+    </div>
+
+    <div class="section-title">Estacionamento</div>
+    <div class="field">
+      <label>Estacionamento</label>
+      <div class="radio-group">
+        <div class="radio-btn" data-group="estac" data-value="incluso" onclick="selectRadio(this)">Incluso</div>
+        <div class="radio-btn" data-group="estac" data-value="pago" onclick="selectRadio(this)">Pago</div>
+        <div class="radio-btn" data-group="estac" data-value="nao" onclick="selectRadio(this)">Não possui</div>
+      </div>
+    </div>
+    <div class="field conditional" id="cond-estac-valor">
+      <label>Valor do estacionamento (por dia)</label>
+      <input type="text" id="estac-valor" placeholder="Ex: R$ 20,00/dia"/>
+    </div>
+
+    <div class="field" style="margin-top:20px">
+      <label>Outras comodidades não listadas</label>
+      <textarea id="comod-extras" placeholder="Descreva outras comodidades que a propriedade oferece..."></textarea>
+    </div>
+  </div>
+
+  <!-- STEP 6: LAZER E EXPERIÊNCIA -->
+  <div class="step" id="step-6">
+    <div class="step-header">
+      <h2>Lazer e <span>Experiência</span></h2>
+      <p>Estrutura de entretenimento e atividades oferecidas.</p>
+    </div>
+
+    <div class="check-grid">
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="academia"><div class="box"></div>Academia</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="sauna"><div class="box"></div>Sauna</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="jogos"><div class="box"></div>Sala de jogos</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="bicicletas"><div class="box"></div>Bicicletas</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="praia"><div class="box"></div>Acesso à praia / Lago</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="trilhas"><div class="box"></div>Trilhas / Natureza</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="quadra"><div class="box"></div>Quadra esportiva</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="banheira"><div class="box"></div>Banheira de imersão</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="spa"><div class="box"></div>Spa / Massagem</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="lazer" value="playground"><div class="box"></div>Playground</label>
+    </div>
+
+    <div class="field" style="margin-top:22px">
+      <label>Atividades extras oferecidas</label>
+      <textarea id="lazer-extras" placeholder="Ex: passeios de barco, aulas de surf, trilhas guiadas, degustação de vinhos..."></textarea>
+    </div>
+  </div>
+
+  <!-- STEP 7: SERVIÇOS ADICIONAIS -->
+  <div class="step" id="step-7">
+    <div class="step-header">
+      <h2>Serviços <span>Adicionais</span></h2>
+      <p>Serviços extras que a propriedade oferece além da hospedagem.</p>
+    </div>
+
+    <div class="check-grid">
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="servicos" value="transfer"><div class="box"></div>Transfer</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="servicos" value="bar"><div class="box"></div>Bar</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="servicos" value="restaurante"><div class="box"></div>Restaurante</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="servicos" value="quarto"><div class="box"></div>Serviço de quarto</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="servicos" value="bagagens"><div class="box"></div>Depósito de bagagens</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="servicos" value="bicicleta-aluguel"><div class="box"></div>Aluguel de bicicleta</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="servicos" value="lavanderia-servico"><div class="box"></div>Lavanderia (serviço)</label>
+      <label class="check-item" onclick="toggleCheck(this, event)"><input type="checkbox" name="servicos" value="concierge"><div class="box"></div>Concierge</label>
+    </div>
+
+    <div class="field" style="margin-top:22px">
+      <label>Outros serviços não listados</label>
+      <textarea id="servicos-outros" placeholder="Descreva outros serviços disponíveis..."></textarea>
+    </div>
+  </div>
+
+  <!-- STEP 8: OBSERVAÇÕES FINAIS -->
+  <div class="step" id="step-8">
+    <div class="step-header">
+      <h2>Observações <span>Finais</span></h2>
+      <p>Informações adicionais importantes para o anúncio da sua propriedade.</p>
+    </div>
+
+    <div class="field">
+      <label>Nome da propriedade <span class="req">*</span></label>
+      <input type="text" id="prop-nome" placeholder="Nome da sua propriedade"/>
+      <span class="err-msg">Por favor, informe o nome da propriedade.</span>
+    </div>
+
+    <div class="field">
+      <label>Informações adicionais relevantes</label>
+      <textarea id="obs-gerais" placeholder="Alguma informação extra que seja importante para a criação do anúncio?"></textarea>
+    </div>
+    <div class="field">
+      <label>Restrições ou limitações da propriedade</label>
+      <textarea id="obs-restricoes" placeholder="Ex: não aceita fumantes, limite de barulho às 22h..."></textarea>
+    </div>
+    <div class="field">
+      <label>Diferenciais competitivos (o que torna sua propriedade única?)</label>
+      <textarea id="obs-diferenciais" placeholder="Ex: vista para o mar, trilha exclusiva, café colonial artesanal..."></textarea>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="success">
+    <div class="success-icon">✓</div>
+    <h2>OBRIGADO(A)!</h2>
+    <p>Recebemos as informações de comodidades da sua propriedade.<br>Nossa equipe já pode começar a trabalhar!</p>
+  </div>
+
+</main>
+
+<footer>
+  <a href="https://stayinnbr.com.br" target="_blank">stayinnbr.com.br</a> · comercial@stayinn.com.br
+</footer>
+
+<div id="nav">
+  <button class="btn" id="btn-prev" onclick="prevStep()" style="visibility:hidden">← Voltar</button>
+  <button class="btn" id="btn-next" onclick="nextStep()">Próximo →</button>
+</div>
+
+<script>
+let current = 1;
+const total = 8;
+let quartoCount = 0;
+
+function updateUI() {
+  const pct = Math.round((current / total) * 100);
+  document.getElementById('step-label').textContent = 'Etapa ' + current + ' de ' + total;
+  document.getElementById('step-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('btn-prev').style.visibility = current > 1 ? 'visible' : 'hidden';
+  document.getElementById('btn-next').textContent = current === total ? 'Enviar formulário ✓' : 'Próximo →';
+}
+
+function validateStep(n) {
+  const rules = { 8: [['f-prop-nome', 'prop-nome']] };
+  document.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+  let ok = true;
+  (rules[n] || []).forEach(([fid, iid]) => {
+    const input = document.getElementById(iid);
+    const field = document.getElementById(fid);
+    if (input && !input.value.trim()) {
+      if (field) field.classList.add('has-error');
+      ok = false;
+    }
+  });
+  return ok;
+}
+
+function nextStep() {
+  if (!validateStep(current)) return;
+  if (current === total) { submitForm(); return; }
+  document.getElementById('step-' + current).classList.remove('active');
+  current++;
+  document.getElementById('step-' + current).classList.add('active');
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function prevStep() {
+  if (current === 1) return;
+  document.getElementById('step-' + current).classList.remove('active');
+  current--;
+  document.getElementById('step-' + current).classList.add('active');
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectRadio(el) {
+  const group = el.getAttribute('data-group');
+  document.querySelectorAll('.radio-btn[data-group="' + group + '"]').forEach(btn => btn.classList.remove('selected'));
+  el.classList.add('selected');
+
+  // Conditionals
+  if (group === 'wifi') toggleWifi(el.getAttribute('data-value'));
+  if (group === 'cafe-manha') {
+    const c = document.getElementById('cond-cafe-valor');
+    if (c) c.classList.toggle('show', el.getAttribute('data-value') === 'pago');
+  }
+  if (group === 'estac') {
+    const c = document.getElementById('cond-estac-valor');
+    if (c) c.classList.toggle('show', el.getAttribute('data-value') === 'pago');
+  }
+  if (group === 'tipo-checkin') {
+    const c = document.getElementById('cond-checkin-outro');
+    if (c) c.classList.toggle('show', el.getAttribute('data-value') === 'outro');
+  }
+}
+
+function toggleCheck(el, event) {
+  if (event) event.preventDefault();
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input[type=checkbox]');
+  if (cb) cb.checked = el.classList.contains('checked');
+}
+
+function toggleWifi(val) {
+  const c = document.getElementById('cond-wifi');
+  if (c) c.classList.toggle('show', val === 'sim');
+}
+
+function addQuarto() {
+  quartoCount++;
+  const container = document.getElementById('quartos-container');
+  const div = document.createElement('div');
+  div.style.cssText = 'background:#fff;border:2px solid var(--sand);border-radius:var(--radius);padding:18px;margin-bottom:14px;';
+  div.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <strong style="font-size:13px;color:var(--gold)">Unidade ${quartoCount}</strong>
+      <button onclick="this.parentElement.parentElement.remove();quartoCount--" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px">×</button>
+    </div>
+    <div class="row">
+      <div class="field"><label>Nome / Tipo</label><input type="text" placeholder="Ex: Cabana Família"/></div>
+      <div class="field"><label>Capacidade (pessoas)</label><input type="number" placeholder="4"/></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Tipo de cama</label><input type="text" placeholder="Ex: 1 casal + 2 solteiros"/></div>
+      <div class="field"><label>Tamanho (m²)</label><input type="number" placeholder="30"/></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Banheiro</label>
+        <select><option value="">Selecione</option><option>Interno</option><option>Externo</option><option>Compartilhado</option></select>
+      </div>
+      <div class="field"><label>Cozinha privativa?</label>
+        <select><option value="">Selecione</option><option>Sim</option><option>Não</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Ar-condicionado?</label>
+        <select><option value="">Selecione</option><option>Sim</option><option>Não</option><option>Ventilador</option></select>
+      </div>
+      <div class="field"><label>TV?</label>
+        <select><option value="">Selecione</option><option>Sim</option><option>Não</option></select>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+function getRadio(name) {
+  const el = document.querySelector('.radio-btn.selected[data-group="' + name + '"]');
+  return el ? el.getAttribute('data-value') : '';
+}
+
+function getChecks(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value).join(', ');
+}
+
+async function submitForm() {
+  const btn = document.getElementById('btn-next');
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+
+  const data = {
+    'Propriedade': document.getElementById('prop-nome')?.value || '',
+    'CheckIn Inicio': document.getElementById('checkin-inicio')?.value || '',
+    'CheckIn Fim': document.getElementById('checkin-fim')?.value || '',
+    'Tipo CheckIn': getRadio('tipo-checkin'),
+    'CheckOut Inicio': document.getElementById('checkout-inicio')?.value || '',
+    'CheckOut Fim': document.getElementById('checkout-fim')?.value || '',
+    'Tipo CheckOut': getRadio('tipo-checkout'),
+    'Recepcao Horario': document.getElementById('recepcao-horario')?.value || '',
+    'Canal Contato': getRadio('canal'),
+    'Com WhatsApp': document.getElementById('com-whatsapp')?.value || '',
+    'Com Telefone': document.getElementById('com-telefone')?.value || '',
+    'Com Email': document.getElementById('com-email')?.value || '',
+    'Com Outro': document.getElementById('com-outro')?.value || '',
+    'WiFi': getRadio('wifi'),
+    'WiFi Nome': document.getElementById('wifi-nome')?.value || '',
+    'WiFi Senha': document.getElementById('wifi-senha')?.value || '',
+    'WiFi Cobertura': getRadio('wifi-cobertura'),
+    'WiFi Velocidade': document.getElementById('wifi-velocidade')?.value || '',
+    'Capacidade Total': document.getElementById('cap-total')?.value || '',
+    'Num Unidades': document.getElementById('num-unidades')?.value || '',
+    'Descricao Geral': document.getElementById('desc-geral')?.value || '',
+    'Areas Comuns': document.getElementById('areas-comuns')?.value || '',
+    'Comodidades': getChecks('comod'),
+    'TV Polegadas': document.getElementById('tv-pol')?.value || '',
+    'Cafe Manha': getRadio('cafe-manha'),
+    'Cafe Valor': document.getElementById('cafe-valor')?.value || '',
+    'Estacionamento': getRadio('estac'),
+    'Estac Valor': document.getElementById('estac-valor')?.value || '',
+    'Comod Extras': document.getElementById('comod-extras')?.value || '',
+    'Lazer': getChecks('lazer'),
+    'Lazer Extras': document.getElementById('lazer-extras')?.value || '',
+    'Servicos': getChecks('servicos'),
+    'Servicos Outros': document.getElementById('servicos-outros')?.value || '',
+    'Observacoes Gerais': document.getElementById('obs-gerais')?.value || '',
+    'Restricoes': document.getElementById('obs-restricoes')?.value || '',
+    'Diferenciais': document.getElementById('obs-diferenciais')?.value || '',
+  };
+
+  try {
+    await fetch('https://api.sheetmonkey.io/form/SEU_ID_AQUI', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  } catch(e) { console.error('Erro ao enviar:', e); }
+
+  document.getElementById('step-' + current).classList.remove('active');
+  document.getElementById('nav').style.display = 'none';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('step-label').textContent = 'Concluído!';
+  document.getElementById('step-pct').textContent = '100%';
+  document.getElementById('success').style.display = 'block';
+}
+
+// Init first quarto
+addQuarto();
+updateUI();
+</script>
+</body>
+</html>
